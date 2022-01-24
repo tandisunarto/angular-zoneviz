@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "agency_a",
+    "enclaves": [
+      {
+        "id": 1,
+        "worldId": 1,
+        "name": "agency_a_enc",
+        "description": "first enclave",
+        "type": "site",
+        "level": "level-1"
+      }
+    ]
+  }
+]

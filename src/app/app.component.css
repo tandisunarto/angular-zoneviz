@@ -1,0 +1,12 @@
+p {
+  font-family: Lato;
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  align-content: flex-start;  
+}
+canvas {
+  background-color: beige;
+}

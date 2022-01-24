@@ -1,0 +1,76 @@
+[
+  {
+    "id": 1,
+    "securityZones": [
+      {
+        "id": 1,
+        "name": "nipr",
+        "type": "Untrust",
+        "path": [1, 2, 3]
+      },
+      {
+        "id": 2,
+        "name": "dmz",
+        "type": "Untrust",
+        "path": [1, 2, 3]
+      },
+      {
+        "id": 3,
+        "name": "cp",
+        "type": "Untrust",
+        "path": [1, 2, 3]
+      }
+    ],
+    "networkObjects": [
+      {
+        "id": 1,
+        "name": "agency-a-fw",
+        "type": "Firewall"
+      },
+      {
+        "id": 2,
+        "name": "F5",
+        "type": "LoadBalancer"
+      },
+      {
+        "id": 3,
+        "name": "JRCE",
+        "type": "Router"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "securityZones": [
+      {
+        "id": 1,
+        "name": "nipr-other",
+        "type": "Untrust",
+        "path": [1, 2, 3]
+      },
+      {
+        "id": 2,
+        "name": "dmz-other",
+        "type": "Untrust",
+        "path": [1, 2, 3]
+      }
+    ],
+    "networkObjects": [
+      {
+        "id": 1,
+        "name": "agency-a-fw-other",
+        "type": "Firewall"
+      },
+      {
+        "id": 2,
+        "name": "F5-other",
+        "type": "LoadBalancer"
+      },
+      {
+        "id": 3,
+        "name": "JRCE-other",
+        "type": "Router"
+      }
+    ]
+  }
+]
