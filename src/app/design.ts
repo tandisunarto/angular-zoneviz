@@ -31,7 +31,7 @@ export function buildWorldElements(worlds: any[]): CanvasElement[] {
       width: enclaveWidth,
       height: enclaveHeight,
       siteName: world.name,
-      elementType: 'rectangle',
+      elementType: 'roundrectangle',
       elementColor: '#B1F196',
       fontColor: 'black',
       fontScale: 17,
@@ -73,47 +73,42 @@ export function buildEnclaveElements(): CanvasElement[] {
       });
     });
 
-    console.log(networkObjects);
-
     securityZones.forEach((securityZone, zoneIndex) => {
       const { path } = securityZone;
-      const elementZoneWidth = 80;
-      const elementZoneHeight = 35;
+      const elementWidth = 80;
+      const elementHeight = 35;
 
-      let previousNetworkObjectIndex = null;
-      let currentNetworkObjectIndex = null;
+      let previousElement = null;
+      let currentElement = null;
 
       path.forEach((id, index) => {
-        previousNetworkObjectIndex =
-          currentNetworkObjectIndex !== null
-            ? currentNetworkObjectIndex
-            : previousNetworkObjectIndex;
-        currentNetworkObjectIndex = networkObjects.findIndex(
-          (n) => n.id === id
-        );
-        xOffset = xMargin + 400 * currentNetworkObjectIndex;
-        yOffset = yMargin + zoneIndex * 40;
-        const networkObject = networkObjects.find((n) => n.id === id);
+        previousElement =
+          currentElement !== null ? currentElement : previousElement;
 
-        canvasElements.push({
+        let currentElementIndex = networkObjects.findIndex((n) => n.id === id);
+
+        xOffset = xMargin + 400 * currentElementIndex;
+        yOffset = yMargin + zoneIndex * 40;
+        currentElement = {
           x: xStart + xOffset,
           y: yStart + yOffset,
-          width: elementZoneWidth,
-          height: elementZoneHeight,
+          width: elementWidth,
+          height: elementHeight,
           siteName: securityZone.name,
           elementType: 'roundrectangle',
           elementColor: '#224A11',
           fontColor: 'white',
           fontScale: 14,
           hasEvent: true,
-        });
+        };
 
-        if (currentNetworkObjectIndex > 0) {
-          // connection line
+        canvasElements.push(currentElement);
+
+        if (previousElement !== null) {
           canvasElements.push({
             x: xStart + xOffset,
-            y: yStart + yOffset + elementZoneHeight / 2,
-            width: 400 - elementZoneWidth,
+            y: yStart + yOffset + elementHeight / 2,
+            width: currentElement.x - previousElement.x - previousElement.width,
             height: 50,
             siteName: '',
             elementType: 'line',
