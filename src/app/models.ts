@@ -19,11 +19,12 @@ export interface CanvasElement {
   elementColor: string;
 
   siteName: string;
-  // siteDescription: string;
+  siteDescription: string;
   // siteType: SiteType;
 
   fontColor: string;
   fontScale: number;
 
   hasEvent: boolean;
+  eventArgs: any;
 }

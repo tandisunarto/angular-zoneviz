@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import { CanvasElement } from './models';
 import { draw } from './render';
 import { buildWorldElements, buildEnclaveElements } from './design';
-import { worlds } from './data';
+import { data } from './data';
 import { elementEventFullName } from '@angular/compiler/src/view_compiler/view_compiler';
 
 @Component({
@@ -21,18 +21,28 @@ export class AppComponent {
     this.context.canvas.height = window.innerHeight - 50;
     this.context.canvas.width = window.innerWidth - 300;
 
-    const ctx = this.context;
+    const context = this.context;
     const canvas = d3.select('canvas').node();
 
-    // const canvasElements: CanvasElement[] = buildWorldElements(worlds);
-    const canvasElements: CanvasElement[] = buildEnclaveElements();
-    const elementPaths = draw(canvasElements, this.context);
+    let canvasElements: CanvasElement[] = buildWorldElements(data);
+    let actionElements = draw(canvasElements, this.context);
 
     canvas.addEventListener('click', function (event) {
-      elementPaths.forEach((p) => {
-        if (ctx.isPointInPath(p.path, event.clientX, event.clientY))
-          alert(`${p.name} clicked`);
-      });
+      for (var actionElement of actionElements) {
+        if (
+          context.isPointInPath(
+            actionElement.path,
+            event.clientX,
+            event.clientY
+          )
+        ) {
+          // alert(`${actionElement.name} clicked`);
+          context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+          canvasElements = buildEnclaveElements(actionElement);
+          actionElements = draw(canvasElements, context);
+          break;
+        }
+      }
     });
   }
 }

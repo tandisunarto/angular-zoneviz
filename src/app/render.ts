@@ -6,7 +6,6 @@ let drawCanvas: any;
 let ctx: any;
 
 export function draw(canvasElements: CanvasElement[], context: any) {
-  // drawCanvas = canvas;
   ctx = context;
   let paths: any[] = [];
   canvasElements.forEach((canvasElement) => {
@@ -30,6 +29,7 @@ export function draw(canvasElements: CanvasElement[], context: any) {
           paths.push({
             path: path,
             name: canvasElement.siteName,
+            args: canvasElement.eventArgs,
           });
         }
         break;
@@ -85,6 +85,7 @@ function drawRoundRectangle(canvasElement: CanvasElement) {
     width,
     height,
     siteName,
+    siteDescription,
     elementType,
     elementColor,
     fontColor,
@@ -113,6 +114,8 @@ function drawRoundRectangle(canvasElement: CanvasElement) {
   ctx.fillStyle = fontColor;
   ctx.font = fontScaleToString(fontScale);
   ctx.fillText(siteName, x + 10, y + 15);
+  ctx.font = fontScaleToString(fontScale - 5);
+  ctx.fillText(siteDescription, x + 10, y + 35);
 
   return path;
 }

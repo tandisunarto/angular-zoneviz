@@ -1,4 +1,4 @@
-import { enclaves } from './data';
+import { data, enclaves } from './data';
 import { CanvasElement } from './models';
 
 export function buildWorldElements(worlds: any[]): CanvasElement[] {
@@ -31,11 +31,16 @@ export function buildWorldElements(worlds: any[]): CanvasElement[] {
       width: enclaveWidth,
       height: enclaveHeight,
       siteName: world.name,
+      siteDescription: world.description,
       elementType: 'roundrectangle',
       elementColor: '#B1F196',
       fontColor: 'black',
       fontScale: 17,
       hasEvent: true,
+      eventArgs: {
+        id: world.id,
+        level: world.level,
+      },
     });
 
     currentRowCount++;
@@ -43,9 +48,12 @@ export function buildWorldElements(worlds: any[]): CanvasElement[] {
   return canvasElements;
 }
 
-export function buildEnclaveElements(): CanvasElement[] {
+export function buildEnclaveElements(actionElement: any): CanvasElement[] {
   let canvasElements: CanvasElement[] = [];
-  enclaves.forEach((enclave, enclaveIndex) => {
+
+  const enclaveData = getEnclaveData(actionElement.args);
+
+  enclaveData.enclaves.forEach((enclave, enclaveIndex) => {
     const { securityZones, networkObjects } = enclave;
 
     let xStart: number = 20;
@@ -65,11 +73,13 @@ export function buildEnclaveElements(): CanvasElement[] {
         width: 200,
         height: 200,
         siteName: networkObject.name,
+        siteDescription: '',
         elementType: 'rectangle',
         elementColor: '#B1F196',
         fontColor: 'black',
         fontScale: 14,
         hasEvent: false,
+        eventArgs: {},
       });
     });
 
@@ -95,11 +105,13 @@ export function buildEnclaveElements(): CanvasElement[] {
           width: elementWidth,
           height: elementHeight,
           siteName: securityZone.name,
+          siteDescription: '',
           elementType: 'roundrectangle',
           elementColor: '#224A11',
           fontColor: 'white',
           fontScale: 14,
           hasEvent: true,
+          eventArgs: {},
         };
 
         canvasElements.push(currentElement);
@@ -111,11 +123,13 @@ export function buildEnclaveElements(): CanvasElement[] {
             width: currentElement.x - previousElement.x - previousElement.width,
             height: 50,
             siteName: '',
+            siteDescription: '',
             elementType: 'line',
             elementColor: '#224A11',
             fontColor: '',
             fontScale: 12,
             hasEvent: false,
+            eventArgs: {},
           });
         }
       });
@@ -123,4 +137,8 @@ export function buildEnclaveElements(): CanvasElement[] {
   });
 
   return canvasElements;
+}
+
+function getEnclaveData(args: any): any {
+  return data.find((d) => d.id === args.id && d.level === args.level);
 }
