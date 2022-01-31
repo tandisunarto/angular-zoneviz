@@ -33,6 +33,8 @@ export enum Action {
   CollapseAll = 'Collapse All',
   Collapse = 'Collapse',
   Expand = 'Expand',
+  ExpandLevel1 = 'Expand Level 1',
+  ExpandLevel2 = 'Expand Level 2',
   Show = 'Show',
   None = 'None'
 }

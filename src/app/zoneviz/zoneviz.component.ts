@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
+import { of } from 'rxjs';
 import { Action, CanvasElement } from '../services/canvas-models';
 import { getData, getEnclaveData } from '../services/data';
 import { buildEnclaveElements, buildWorldElements } from '../services/design';
@@ -14,6 +15,8 @@ export class ZonevizComponent implements OnInit {
   private d3lib: any;
   private canvas: any;
   private context: any;
+  private data: any;
+  private selectedWorld: any;
 
   // private currentSite: Site;
   // private currentOrganization: Organization;
@@ -45,6 +48,7 @@ export class ZonevizComponent implements OnInit {
 
       // let canvasElements: CanvasElement[] = [];
 
+      this.data = data;
       this.canvasElements = buildWorldElements(data);
 
       this.canvas = this.d3lib
@@ -76,83 +80,62 @@ export class ZonevizComponent implements OnInit {
       //   draw(canvasElements, this.context);
       // })
       // ************************************************************
-
-      // let actionElements: = draw(canvasElements, this.context);
-
-      // const context = this.context;
-      // const zoneCanvas = document.getElementById('canvas');
-
-      // zoneCanvas?.addEventListener('click', function (event: any) {
-      //   for (var actionElement of actionElements) {
-      //     if (
-      //       context.isPointInPath(
-      //         actionElement.path,
-      //         event.clientX,
-      //         event.clientY
-      //       )
-      //     ) {
-      //       // console.log(actionElement);
-      //       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-      //       const { id, level } = actionElement.args;
-      //       getEnclaveData(level, id).subscribe(data => {
-      //         canvasElements = buildEnclaveElements(data);
-      //         actionElements = draw(canvasElements, context);
-      //       })
-      //       break;
-      //     }
-      //   }
-      // });
     });
-
 
     this.registerEvents();
   }
 
   registerEvents() {
-    const context = this.context;
     const zoneCanvas = document.getElementById('canvas');
-
-    let actionElements = this.actionElements;
-    let canvasElements = this.canvasElements;
+    const t = this;
 
     zoneCanvas?.addEventListener('click', function (event: any) {
-      for (var actionElement of actionElements) {
+      for (var actionElement of t.actionElements) {
         if (
-          context.isPointInPath(
+          t.context.isPointInPath(
             actionElement.path,
             event.clientX,
             event.clientY
           )
         ) {
-
-          context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+          t.context.clearRect(0, 0, t.context.canvas.width, t.context.canvas.height);
           const { id, level, action } = actionElement.args;
-
-          console.log(id, level, action)
 
           switch (action) {
             case Action.Expand: {
-              getEnclaveData(level, id).subscribe(data => {
-                canvasElements = buildEnclaveElements(data);
-                actionElements = draw(canvasElements, context);
-              })
+              const showLevel2 = level === 2 ? true : false;
+              if (level === 0) {
+                t.selectedWorld = t.getWorldByLevelAndId(level, id);
+              }
+              t.canvasElements = buildEnclaveElements(t.selectedWorld, showLevel2);
+              t.actionElements = draw(t.canvasElements, t.context);
               break
+            }
+            case Action.Collapse: {
+              console.log(id, level, action);
+              const showLevel2 = false;
+              t.canvasElements = buildEnclaveElements(t.selectedWorld, showLevel2);
+              t.actionElements = draw(t.canvasElements, t.context);
+              break;
             }
             case Action.CollapseAll: {
               getData().toPromise().then(data => {
-                canvasElements = buildWorldElements(data);
-                actionElements = draw(canvasElements, context);
+                t.canvasElements = buildWorldElements(data);
+                t.actionElements = draw(t.canvasElements, t.context);
               });
               break;
             }
+            case Action.Show: {
+              break;
+            }
           }
-          // getEnclaveData(level, id).subscribe(data => {
-          //   canvasElements = buildEnclaveElements(data);
-          //   actionElements = draw(canvasElements, context);
-          // })
           break;
         }
       }
     });
+  }
+
+  getWorldByLevelAndId(level: number, id: number): any {
+    return this.data.find(d => d.id === id && d.level === level);
   }
 }

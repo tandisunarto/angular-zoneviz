@@ -48,7 +48,7 @@ export function buildWorldElements(worlds: any[]): CanvasElement[] {
   return canvasElements;
 }
 
-export function buildEnclaveElements(data: any): CanvasElement[] {
+export function buildEnclaveElements(data: any, showLevel2: boolean): CanvasElement[] {
   let canvasElements: CanvasElement[] = [];
 
   canvasElements.push({
@@ -75,6 +75,48 @@ export function buildEnclaveElements(data: any): CanvasElement[] {
   data.enclaves.forEach((enclave, enclaveIndex) => {
     const { securityZones, networkObjects } = enclave;
 
+    if (enclave.level === 2) {
+      if (showLevel2) {
+        canvasElements.push({
+          x: 20,
+          y: verticalOffset,
+          width: 120,
+          height: 30,
+          siteName: 'Collapse',
+          siteDescription: '',
+          elementType: 'roundrectangle',
+          elementColor: '#1E201E',
+          fontColor: 'white',
+          fontScale: 14,
+          hasEvent: true,
+          eventArgs: {
+            id: enclave.id,
+            level: enclave.level,
+            action: Action.Collapse
+          },
+        });
+      } else {
+        canvasElements.push({
+          x: 20,
+          y: verticalOffset,
+          width: 150,
+          height: 70,
+          siteName: enclave.name,
+          siteDescription: '',
+          elementType: 'roundrectangle',
+          elementColor: '#B1F196',
+          fontColor: 'black',
+          fontScale: 14,
+          hasEvent: true,
+          eventArgs: {
+            id: enclave.id,
+            level: enclave.level,
+            action: Action.Expand
+          },
+        });
+      }
+    }
+
     const networkObjectWidth = 200;
     const networkObjectHeight = 45 * (securityZones.length > 2 ? securityZones.length : 2) + 50;
     const networkObjectOffsetX = 500;
@@ -84,84 +126,87 @@ export function buildEnclaveElements(data: any): CanvasElement[] {
     let enclaveY: number = 70;
 
     horizontalOffset = 0;
-    networkObjects.forEach((networkObject, index) => {
-      canvasElements.push({
-        x: enclaveX + horizontalOffset,
-        y: enclaveY + verticalOffset,
-        width: networkObjectWidth,
-        height: networkObjectHeight,
-        siteName: networkObject.name,
-        siteDescription: '',
-        elementType: 'rectangle',
-        elementColor: '#B1F196',
-        fontColor: 'black',
-        fontScale: 14,
-        hasEvent: false,
-        eventArgs: {},
-      });
-      horizontalOffset += networkObjectOffsetX;
-    });
-
-    let zoneX: number = 20;
-    let zoneY: number = 40 + verticalOffset;
-
-    verticalOffset += networkObjectHeight + networkObjectOffsetY;
-
-    securityZones.forEach((securityZone, zoneIndex) => {
-      const { path } = securityZone;
-      const zoneNodetWidth = 100;
-      const zoneNodeHeight = 35;
-
-      let previousZoneNode: any = null;
-      let currentZoneNode: any = null;
-
-      let zoneHorizontalOffset: number;
-      let zoneVerticalOffset: number;
-
-      path.forEach((id, index) => {
-        previousZoneNode =
-          currentZoneNode !== null ? currentZoneNode : previousZoneNode;
-
-        let networkObjectIndex = networkObjects.findIndex((n) => n.id === id);
-
-        zoneHorizontalOffset = zoneX + networkObjectOffsetX * networkObjectIndex;
-        zoneVerticalOffset = zoneY + zoneIndex * 45;
-        currentZoneNode = {
-          x: enclaveX + zoneHorizontalOffset,
-          y: enclaveY + zoneVerticalOffset,
-          width: zoneNodetWidth,
-          height: zoneNodeHeight,
-          siteName: securityZone.name,
+    if (enclave.level === 1 || (enclave.level === 2 && showLevel2)) {
+      networkObjects.forEach((networkObject, index) => {
+        canvasElements.push({
+          x: enclaveX + horizontalOffset,
+          y: enclaveY + verticalOffset,
+          width: networkObjectWidth,
+          height: networkObjectHeight,
+          siteName: networkObject.name,
           siteDescription: '',
-          elementType: 'roundrectangle',
-          elementColor: '#224A11',
-          fontColor: 'white',
+          elementType: 'rectangle',
+          elementColor: '#B1F196',
+          fontColor: 'black',
           fontScale: 14,
-          hasEvent: true,
+          hasEvent: false,
           eventArgs: {},
-        };
-
-        canvasElements.push(currentZoneNode);
-
-        // line connecting zone nodes
-        if (previousZoneNode !== null) {
-          canvasElements.push({
-            x: enclaveX + zoneHorizontalOffset,
-            y: enclaveY + zoneVerticalOffset + zoneNodeHeight / 2,
-            width: currentZoneNode.x - previousZoneNode.x - previousZoneNode.width,
-            height: 0,
-            siteName: '',
-            siteDescription: '',
-            elementType: 'line',
-            elementColor: '#224A11',
-            fontColor: '',
-            fontScale: 12,
-            hasEvent: false,
-            eventArgs: {},
-          });
-        }
+        });
+        horizontalOffset += networkObjectOffsetX;
       });
-    });
+
+
+      let zoneX: number = 20;
+      let zoneY: number = 40 + verticalOffset;
+
+      verticalOffset += networkObjectHeight + networkObjectOffsetY;
+
+      securityZones.forEach((securityZone, zoneIndex) => {
+        const { path } = securityZone;
+        const zoneNodetWidth = 100;
+        const zoneNodeHeight = 35;
+
+        let previousZoneNode: any = null;
+        let currentZoneNode: any = null;
+
+        let zoneHorizontalOffset: number;
+        let zoneVerticalOffset: number;
+
+        path.forEach((id, index) => {
+          previousZoneNode =
+            currentZoneNode !== null ? currentZoneNode : previousZoneNode;
+
+          let networkObjectIndex = networkObjects.findIndex((n) => n.id === id);
+
+          zoneHorizontalOffset = zoneX + networkObjectOffsetX * networkObjectIndex;
+          zoneVerticalOffset = zoneY + zoneIndex * 45;
+          currentZoneNode = {
+            x: enclaveX + zoneHorizontalOffset,
+            y: enclaveY + zoneVerticalOffset,
+            width: zoneNodetWidth,
+            height: zoneNodeHeight,
+            siteName: securityZone.name,
+            siteDescription: '',
+            elementType: 'roundrectangle',
+            elementColor: '#224A11',
+            fontColor: 'white',
+            fontScale: 14,
+            hasEvent: true,
+            eventArgs: {},
+          };
+
+          canvasElements.push(currentZoneNode);
+
+          // line connecting zone nodes
+          if (previousZoneNode !== null) {
+            canvasElements.push({
+              x: enclaveX + zoneHorizontalOffset,
+              y: enclaveY + zoneVerticalOffset + zoneNodeHeight / 2,
+              width: currentZoneNode.x - previousZoneNode.x - previousZoneNode.width,
+              height: 0,
+              siteName: '',
+              siteDescription: '',
+              elementType: 'line',
+              elementColor: '#224A11',
+              fontColor: '',
+              fontScale: 12,
+              hasEvent: false,
+              eventArgs: {},
+            });
+          }
+        });
+      });
+    }
   });
 
   return canvasElements;
